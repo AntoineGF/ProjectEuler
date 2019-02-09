@@ -30,3 +30,92 @@
 # What is the greatest product of four adjacent numbers in the same direction
 # (up, down, left, right, or diagonally) in the 20×20 grid?
 # -----------------
+
+import numpy as np
+
+# Read and store grid in ndarray (numpy)
+grid = np.zeros( (20,20) )
+for idx, l in enumerate( open('Problem11_input.txt','r').readlines() ):
+    # Store numbers in a list (split by ' ')
+    temp = l.split(' ')
+    # Turn strings into integer
+    grid_line = [int(ele) for ele in temp]
+    # Store the line in the grid
+    grid[idx] = grid_line
+
+# Find the maximum product row-wise
+def max_row(grid):
+    max = 0
+    # Iterate over the rows
+    for i in range(0, 20):
+        # Iterate over the columns:
+        for j in range(0, 20-3):
+            indices = list(range(j, j+4))
+            if np.prod(grid[i, indices]) > max:
+                max = np.prod(grid[i, indices])
+                position = [i, (indices)]
+                combination = grid[i, indices]
+    return max, position, combination
+
+maximum_row, position, combination = max_row(grid)
+
+# Find the maximum product column-wise
+def max_column(grid):
+    max = 0
+    # Iterate over the columns
+    for i in range(0, 20-3):
+        # Iterate over the rows:
+        for j in range(0, 20):
+            indices = list(range(i, i+4))
+            if np.prod(grid[indices, j]) > max:
+                max = np.prod(grid[indices, j])
+                position = [(indices), j]
+                combination = grid[indices, j]
+    return max, position, combination
+
+maximum_column, position, combination = max_column(grid)
+
+# Find the maximum product diagnoal-wise (from top left to bottom right)
+def max_diagonal_right(grid):
+    max = 0
+    # Define the coordinates
+    for i in range(0,20-3):
+        for j in range(0,20-3):
+            # This gives the diagonal coordinates
+            coords = [(i+shift,j+shift) for shift in list(range(0,4))]
+            product = np.prod([grid[c] for c in coords])
+            if product > max:
+                max = product
+                position = coords
+                combination = [grid[c] for c in coords]
+
+    return max, position, combination
+
+maximum_diag_right, position, combination = max_diagonal_right(grid)
+
+
+# Find the maximum product diagnoal-wise (from top right to bottom left)
+def max_diagonal_left(grid):
+    max = 0
+    # Define the coordinates
+    for i in range(0, 20-3):
+        for j in range(3, 20):
+            # This gives the diagonal coordinates
+            coords = [(i+shift,j-shift) for shift in list(range(0,4))]
+            product = np.prod([grid[c] for c in coords])
+            if product > max:
+                max = product
+                position = coords
+                combination = [grid[c] for c in coords]
+
+    return max, position, combination
+
+maximum_diag_left, position, combination = max_diagonal_left(grid)
+
+### RESULTS
+print('1. Row Product: ' + str(maximum_row))
+print('2. Column Product: ' + str(maximum_column))
+print('3. Diag-right Product: ' + str(maximum_diag_right))
+print('4. Diag-left Product: ' + str(maximum_diag_left))
+
+print('The maximum is: ' + str(max([maximum_row, maximum_column, maximum_diag_right, maximum_diag_left])))
